@@ -69,14 +69,14 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist ${{ env.GORELEASER_ARGS }}
+          args: release --clean ${{ env.GORELEASER_ARGS }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
       - name: push docker images (for branches)
         if: github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'
         run: |
-          docker images --format "{{.Repository}}:{{.Tag}}" | grep "ekristen/go-project-template" | xargs -L1 docker push
+          docker images --format "{{.Repository}}:{{.Tag}}" | grep "ekristen/amihan" | xargs -L1 docker push
       - name: upload artifacts
         if: github.event.pull_request.base.ref == 'main'
         uses: actions/upload-artifact@v3

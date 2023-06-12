@@ -1,0 +1,24 @@
+{
+  "version": "4",
+  "groupKey": "example",
+  "truncatedAlerts": 1,
+  "status": "<resolved|firing>",
+  "receiver": "example",
+  "groupLabels": null,
+  "commonLabels": null,
+  "commonAnnotations": null,
+  "externalURL": "http://example",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": null,
+      "annotations": {
+        "nomad_job": "parameterized-job"
+      },
+      "startsAt": "2023-06-11T12:14:31Z",
+      "endsAt": "2023-06-21T12:19:33Z",
+      "generatorURL": null,
+      "fingerprint": null
+    }
+  ]
+}

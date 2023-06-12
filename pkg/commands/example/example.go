@@ -1,7 +1,7 @@
 package example
 
 import (
-	"github.com/ekristen/go-project-template/pkg/common"
+	"github.com/ekristen/amihan/pkg/common"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )

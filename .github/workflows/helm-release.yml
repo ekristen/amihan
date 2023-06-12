@@ -1,0 +1,54 @@
+name: helm-release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/setup-helm@v3
+        name: install-helm
+        with:
+          version: 3.12.0
+        id: install
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: login-ghcr
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: helm-package
+        run: |
+          helm package chart
+      - name: publish-oci
+        run: |
+          export CHART_VERSION=$(grep 'version:' ./chart/Chart.yaml | tail -n1 | awk '{ print $2}')
+          echo "CHART_VERSION=${CHART_VERSION}" >> $GITHUB_ENV
+          helm push amihan-${CHART_VERSION}.tgz oci://ghcr.io/ekristen/amihan-chart
+      - name: upload-package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./amihan-${{ env.CHART_VERSION }}.tgz
+          asset_name: amihan-${{ env.CHART_VERSION }}.tgz
+          asset_content_type: application/gzip
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: chart
+          path: *.tgz

@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yaml
+images:
+  - name: ghcr.io/ekristen/amihan
+    newName: ghcr.io/ekristen/amihan
+    newTag: v0.34.1

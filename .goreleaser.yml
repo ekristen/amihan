@@ -1,10 +1,10 @@
 release:
   github:
     owner: ekristen
-    name: go-project-template
+    name: amihan
   prerelease: auto
 builds:
-  - id: template
+  - id: amihan
     goos:
       - linux
       - darwin
@@ -19,24 +19,24 @@ builds:
       - -X '{{ .ModulePath }}/pkg/common.VERSION={{ .Tag }}'
       - -X '{{ .ModulePath }}/pkg/common.COMMIT={{ .Commit }}'
 archives:
-  - id: template
+  - id: amihan
     builds:
-      - template
-    name_template: "{{ .ProjectName }}-utils-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ .Arm }}"
+      - amihan
+    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ .Arm }}"
     format_overrides:
       - goos: windows
         format: zip
 dockers:
-  - id: template
+  - id: amihan
     ids:
-      - template
+      - amihan
     use: buildx
     goos: linux
     goarch: amd64
     dockerfile: Dockerfile
     image_templates:
-      - ghcr.io/ekristen/go-project-template:v{{ .Version }}
-      - ghcr.io/ekristen/go-project-template:{{ replace .Branch "/" "-" }}-{{ .ShortCommit }}-{{ .Timestamp }}
+      - ghcr.io/ekristen/amihan:v{{ .Version }}
+      - ghcr.io/ekristen/amihan:{{ replace .Branch "/" "-" }}-{{ .ShortCommit }}-{{ .Timestamp }}
     build_flag_templates:
       - "--target=goreleaser"
       - "--pull"
@@ -44,15 +44,15 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source=https://github.com/ekristen/go-project-template"
+      - "--label=org.opencontainers.image.source=https://github.com/ekristen/amihan"
       - "--platform=linux/amd64"
 signs:
   - cmd: cosign # Sign with Password
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
-    args: ["sign-blob", "--yes", "--tlog-upload=false", "--key=cosign.key", "--output=${signature}", "${artifact}"]
+    args: ["sign-blob", "--yes", "--tlog-upload=false", "--key=cosign.key", "--output-signature=${signature}", "${artifact}"]
     artifacts: all
   #- ids:
-  #    - template
+  #    - amihan
   #  cmd: cosign
   #  signature: "${artifact}.sig"
   #  certificate: "${artifact}.pem"
@@ -60,11 +60,11 @@ signs:
   #  artifacts: all
 docker_signs:
   - ids: # Sign With Password
-      - template
+      - amihan
     artifacts: all
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
   #- ids:
-  #    - template
+  #    - amihan
   #  artifacts: all
   #  cmd: cosign
   #  args: ["sign", "--yes", "--oidc-issuer=https://token.actions.githubusercontent.com", "--output-certificate=${certificate}", "--output-signature=${signature}", "${artifact}"]
