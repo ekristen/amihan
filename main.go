@@ -1,14 +1,16 @@
 package main
 
 import (
-	"github.com/rancher/wrangler/pkg/signals"
 	"os"
 	"path"
 
+	"github.com/rancher/wrangler/pkg/signals"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
-	"github.com/ekristen/go-project-template/pkg/common"
+	"github.com/ekristen/amihan/pkg/common"
+
+	_ "github.com/ekristen/amihan/pkg/commands/apiserver"
 )
 
 func main() {

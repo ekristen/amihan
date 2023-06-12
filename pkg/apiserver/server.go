@@ -11,7 +11,9 @@ import (
 )
 
 type Options struct {
-	Port int
+	Port         int
+	NomadAddress string
+	NomadToken   string
 
 	Log *logrus.Entry
 }
@@ -25,6 +27,7 @@ func RunServer(ctx context.Context, opts *Options) error {
 
 	router := mux.NewRouter().StrictSlash(true)
 	router.Path("/").HandlerFunc(RootHandler)
+	router.Path("/webhook").HandlerFunc(WebhookHandlerWrapper(opts.NomadAddress, opts.NomadToken))
 
 	// Below this point is where the server is started and graceful shutdown occurs.
 
