@@ -49,7 +49,7 @@ dockers:
 signs:
   - cmd: cosign # Sign with Password
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
-    args: ["sign-blob", "--yes", "--tlog-upload=false", "--key=cosign.key", "--output=${signature}", "${artifact}"]
+    args: ["sign-blob", "--yes", "--tlog-upload=false", "--key=cosign.key", "--output-signature=${signature}", "${artifact}"]
     artifacts: all
   #- ids:
   #    - amihan
