@@ -31,7 +31,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: helm-package
-        run: |gs
+        run: |
           helm package chart
       - name: publish-oci
         run: |
