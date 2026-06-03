@@ -45,6 +45,46 @@ func postWebhook(t *testing.T, s *Server, body []byte) *httptest.ResponseRecorde
 	return rr
 }
 
+func TestRootHandler(t *testing.T) {
+	s := newTestServer(&fakeDispatcher{}, time.Minute)
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	s.RootHandler(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+	require.Contains(t, rr.Body.String(), `"name":"amihan"`)
+}
+
+func TestHealthHandler(t *testing.T) {
+	s := newTestServer(&fakeDispatcher{}, time.Minute)
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+	s.HealthHandler(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+	require.JSONEq(t, `{"status":"ok"}`, rr.Body.String())
+}
+
+func TestWebhookHandler_DedupesPerFingerprint(t *testing.T) {
+	// Two firing alerts for the same job but distinct fingerprints must both
+	// dispatch — dedup is per alert, not per job.
+	body := []byte(`{"alerts":[
+		{"status":"firing","fingerprint":"aaa","annotations":{"nomad_job":"job-a"}},
+		{"status":"firing","fingerprint":"bbb","annotations":{"nomad_job":"job-a"}}
+	]}`)
+
+	fake := &fakeDispatcher{}
+	s := newTestServer(fake, time.Minute)
+
+	rr := postWebhook(t, s, body)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, []string{"job-a", "job-a"}, fake.calls)
+}
+
 func TestWebhookHandler_DispatchesFiringJob(t *testing.T) {
 	body, err := os.ReadFile("testdata/webhook.json")
 	require.NoError(t, err)
