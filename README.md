@@ -57,7 +57,7 @@ dispatch.
 receivers:
   - name: amihan
     webhook_configs:
-      - url: http://amihan:4242/webhook
+      - url: http://amihan/webhook
 ```
 
 ```yaml
