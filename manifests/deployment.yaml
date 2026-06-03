@@ -13,11 +13,15 @@ spec:
         app: amihan
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
+        prometheus.io/port: "4242"
+        prometheus.io/path: /metrics
     spec:
-      terminationGracePeriodSeconds: 600
+      terminationGracePeriodSeconds: 30
       securityContext:
-        fsGroup: 1337
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
         - name: api
           image: ghcr.io/ekristen/amihan
@@ -30,34 +34,31 @@ spec:
               drop: ["ALL"]
             seccompProfile:
               type: RuntimeDefault
+          args:
+            - api-server
           ports:
             - containerPort: 4242
               name: http
               protocol: TCP
-            - containerPort: 8080
-              name: http-prom
-              protocol: TCP
-            - containerPort: 9440
-              name: healthz
-              protocol: TCP
           env:
-            - name: RUNTIME_NAMESPACE
+            - name: NOMAD_ADDRESS
+              value: http://localhost:4646
+            - name: DISPATCH_COOLDOWN
+              value: 5m
+            - name: NOMAD_TOKEN
               valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          args:
-            - --watch-all-namespaces
-            - --log-level=info
-            - --log-encoding=json
-            - --enable-leader-election
+                secretKeyRef:
+                  name: amihan
+                  key: nomad-token
+                  optional: true
           readinessProbe:
             httpGet:
-              path: /readyz
-              port: healthz
+              path: /healthz
+              port: http
           livenessProbe:
             httpGet:
               path: /healthz
-              port: healthz
+              port: http
           resources:
             limits:
               cpu: 1000m
