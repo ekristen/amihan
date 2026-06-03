@@ -3,10 +3,11 @@ package apiserver
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/hashicorp/nomad/api"
 	"github.com/prometheus/alertmanager/template"
 	"github.com/sirupsen/logrus"
-	"net/http"
 
 	"github.com/ekristen/amihan/pkg/common"
 )
@@ -45,7 +46,6 @@ func WebhookHandlerWrapper(addr, token string) func(w http.ResponseWriter, r *ht
 				if err != nil {
 					log.WithError(err).Error("unable to initialize nomad client")
 					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Fprintf(w, err.Error())
 					return
 				}
 

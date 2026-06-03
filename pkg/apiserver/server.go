@@ -2,10 +2,12 @@ package apiserver
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 )
@@ -37,7 +39,7 @@ func RunServer(ctx context.Context, opts *Options) error {
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			opts.Log.Fatalf("listen: %s\n", err)
 		}
 	}()

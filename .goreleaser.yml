@@ -1,3 +1,4 @@
+version: 2
 release:
   github:
     owner: ekristen
@@ -47,34 +48,30 @@ dockers:
       - "--label=org.opencontainers.image.source=https://github.com/ekristen/amihan"
       - "--platform=linux/amd64"
 signs:
-  - cmd: cosign # Sign with Password
+  - ids:
+      - amihan
+    if: '{{ eq .Env.GITHUB_WORKFLOW "" }}'
+    cmd: cosign # Sign with Password
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
     args: ["sign-blob", "--yes", "--tlog-upload=false", "--key=cosign.key", "--output-signature=${signature}", "${artifact}"]
     artifacts: all
-  #- ids:
-  #    - amihan
-  #  cmd: cosign
-  #  signature: "${artifact}.sig"
-  #  certificate: "${artifact}.pem"
-  #  args: ["sign-blob", "--yes", "--oidc-issuer=https://token.actions.githubusercontent.com", "--output-certificate=${certificate}", "--output-signature=${signature}", "${artifact}"]
-  #  artifacts: all
-docker_signs:
-  - ids: # Sign With Password
+  - ids:
       - amihan
+    if: '{{ ne .Env.GITHUB_WORKFLOW "" }}'
+    cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args: ["sign-blob", "--yes", "--oidc-issuer=https://token.actions.githubusercontent.com", "--output-certificate=${certificate}", "--output-signature=${signature}", "${artifact}"]
     artifacts: all
-    stdin: "{{ .Env.COSIGN_PASSWORD }}"
-  #- ids:
-  #    - amihan
-  #  artifacts: all
-  #  cmd: cosign
-  #  args: ["sign", "--yes", "--oidc-issuer=https://token.actions.githubusercontent.com", "--output-certificate=${certificate}", "--output-signature=${signature}", "${artifact}"]
+#docker_signs:
+#  - ids:
+#      - amihan
+#    artifacts: all
+#    cmd: cosign
+#    args: ["sign", "--yes", "--oidc-issuer=https://token.actions.githubusercontent.com", "--output-certificate=${certificate}", "--output-signature=${signature}", "${artifact}"]
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: '{{ trimprefix .Summary "v" }}'
+  version_template: '{{ trimprefix .Summary "v" }}'
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  disable: true
