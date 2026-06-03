@@ -90,7 +90,7 @@ ingress:
   tls:
     enabled: true
     secret: null
-  host: dockit.example.org
+  host: amihan.example.org
   path: /
   pathType: Prefix
   #  path: / (default)
